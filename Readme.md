@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Anna-Anastasiia Raulets](https://up.htmlacademy.ru/javascript/18/user/870333).
-* Наставник: `Неизвестно`.
+* Наставник: [Леонид Дугенец](https://htmlacademy.ru/profile/laokree).
 
 ---
 
