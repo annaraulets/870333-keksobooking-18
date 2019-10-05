@@ -1,7 +1,7 @@
 'use strict';
 
-var randomRandint = function (from, to) {
-  var number = from + Math.floor(Math.random() * (to - from));
+var randomRandInt = function (from, to) {
+  var number = from + Math.floor(Math.random() * (to + 1 - from));
   return number;
 };
 
@@ -25,7 +25,7 @@ var randomElementAndRemove = function (array) {
 
 // Рандомный состав массива из массивов
 var randomArray = function (array) {
-  var resultLength = randomRandint(1, array.length + 1);
+  var resultLength = randomRandInt(1, array.length);
 
   var result = [];
   for (var i = 0; i < resultLength; i++) {
@@ -36,6 +36,8 @@ var randomArray = function (array) {
 };
 
 var PINS_COUNT = 8;
+var PIN_OFFSET_X = 25;
+var PIN_OFFSET_Y = 70;
 var PRICE_MIN = 1000;
 var PRICE_MAX = 100000;
 var HOTEL_TYPE = ['palace', 'flat', 'house', 'bungalo'];
@@ -54,8 +56,8 @@ var PHOTO_LINKS = [
 // 1.Напишите функцию для создания массива из 8 сгенерированных JS объектов.
 var createPin = function (pinNumber) {
   var mapWidth = document.querySelector('.map__overlay').offsetWidth;
-  var x = randomRandint(100, mapWidth - 100);
-  var y = randomRandint(130, 631);
+  var x = randomRandInt(100, mapWidth);
+  var y = randomRandInt(130, 630);
 
 
   return {
@@ -66,10 +68,10 @@ var createPin = function (pinNumber) {
     offer: {
       title: 'Заголовок обьявления',
       address: x + ', ' + y,
-      price: randomRandint(PRICE_MIN, PRICE_MAX),
+      price: randomRandInt(PRICE_MIN, PRICE_MAX),
       type: randomElement(HOTEL_TYPE),
-      rooms: randomRandint(ROOMS_MIN, ROOMS_MAX),
-      guests: randomRandint(GUESTS_MIN, GUESTS_MAX),
+      rooms: randomRandInt(ROOMS_MIN, ROOMS_MAX),
+      guests: randomRandInt(GUESTS_MIN, GUESTS_MAX),
       checkin: randomElement(TIMES),
       checkout: randomElement(TIMES),
       features: randomArray(FACILITIES),
@@ -102,10 +104,10 @@ var renderPinElement = function (pin) {
   var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
 
   var pinElement = pinTemplate.cloneNode(true);
-  pinElement.style.left = (pin.location.x - 25) + 'px';
-  pinElement.style.top = (pin.location.y - 70) + 'px';
-  pinElement.querySelector('img').setAttribute('src', pin.author.avatar);
-  pinElement.querySelector('img').setAttribute('alt', pin.offer.title);
+  pinElement.style.left = (pin.location.x - PIN_OFFSET_X) + 'px';
+  pinElement.style.top = (pin.location.y - PIN_OFFSET_Y) + 'px';
+  pinElement.querySelector('img').src = pin.author.avatar;
+  pinElement.querySelector('img').alt = pin.offer.title;
 
   return pinElement;
 };
