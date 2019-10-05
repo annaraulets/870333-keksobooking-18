@@ -40,7 +40,7 @@ var PIN_OFFSET_X = 25;
 var PIN_OFFSET_Y = 70;
 var PRICE_MIN = 1000;
 var PRICE_MAX = 100000;
-var HOTEL_TYPE = ['palace', 'flat', 'house', 'bungalo'];
+var HOTEL_TYPES = ['palace', 'flat', 'house', 'bungalo'];
 var ROOMS_MIN = 1;
 var ROOMS_MAX = 5;
 var GUESTS_MIN = 1;
@@ -69,7 +69,7 @@ var createPin = function (pinNumber) {
       title: 'Заголовок обьявления',
       address: x + ', ' + y,
       price: randomRandInt(PRICE_MIN, PRICE_MAX),
-      type: randomElement(HOTEL_TYPE),
+      type: randomElement(HOTEL_TYPES),
       rooms: randomRandInt(ROOMS_MIN, ROOMS_MAX),
       guests: randomRandInt(GUESTS_MIN, GUESTS_MAX),
       checkin: randomElement(TIMES),
