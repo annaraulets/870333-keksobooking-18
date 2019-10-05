@@ -15,10 +15,10 @@ var randomElement = function (array) {
 // Рандомный элемент и удаление из массива
 var randomElementAndRemove = function (array) {
   var randomNumber = Math.floor(Math.random() * array.length);
-
   var result = array[randomNumber];
-  array[randomNumber] = array[array.length - 1];
-  array.pop();
+
+  array.splice(randomNumber, 1);
+
   return result;
 };
 
@@ -35,11 +35,28 @@ var randomArray = function (array) {
   return result;
 };
 
+var PINS_COUNT = 8;
+var PRICE_MIN = 1000;
+var PRICE_MAX = 100000;
+var HOTEL_TYPE = ['palace', 'flat', 'house', 'bungalo'];
+var ROOMS_MIN = 1;
+var ROOMS_MAX = 5;
+var GUESTS_MIN = 1;
+var GUESTS_MAX = 10;
+var TIMES = ['12:00', '13:00', '14:00'];
+var FACILITIES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+var PHOTO_LINKS = [
+  'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
+  'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
+  'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
+
 
 // 1.Напишите функцию для создания массива из 8 сгенерированных JS объектов.
 var createPin = function (pinNumber) {
-  var x = randomRandint(130, 630 + 1);
-  var y = randomRandint(130, 630 + 1);
+  var mapWidth = document.querySelector('.map__overlay').offsetWidth;
+  var x = randomRandint(100, mapWidth - 100);
+  var y = randomRandint(130, 631);
+
 
   return {
     author: {
@@ -47,20 +64,17 @@ var createPin = function (pinNumber) {
     },
 
     offer: {
-      title: ' ',
-      address: x + ' ' + y,
-      price: randomRandint(1000, 100000),
-      type: randomElement(['palace', 'flat', 'house', 'bungalo']),
-      rooms: randomRandint(1, 5),
-      guests: randomRandint(1, 10),
-      checkin: randomElement(['12:00', '13:00', '14:00']),
-      checkout: randomElement(['12:00', '13:00', '14:00']),
-      features: randomArray(['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner']),
+      title: 'Заголовок обьявления',
+      address: x + ', ' + y,
+      price: randomRandint(PRICE_MIN, PRICE_MAX),
+      type: randomElement(HOTEL_TYPE),
+      rooms: randomRandint(ROOMS_MIN, ROOMS_MAX),
+      guests: randomRandint(GUESTS_MIN, GUESTS_MAX),
+      checkin: randomElement(TIMES),
+      checkout: randomElement(TIMES),
+      features: randomArray(FACILITIES),
       description: ' ',
-      photos: randomArray([
-        'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
-        'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
-        'http://o0.github.io/assets/images/tokyo/hotel3.jpg'])
+      photos: randomArray(PHOTO_LINKS)
     },
 
     location: {
@@ -75,8 +89,8 @@ var createPin = function (pinNumber) {
 var createPins = function (pinsCount) {
   var result = [];
 
-  for (var i = 0; i < pinsCount; i++) {
-    result.push(createPin(i + 1));
+  for (var i = 1; i <= pinsCount; i++) {
+    result.push(createPin(i));
   }
 
   return result;
@@ -88,10 +102,10 @@ var renderPinElement = function (pin) {
   var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
 
   var pinElement = pinTemplate.cloneNode(true);
-  pinElement.style.left = pin.location.x + 'px';
-  pinElement.style.top = pin.location.y + 'px';
+  pinElement.style.left = (pin.location.x - 25) + 'px';
+  pinElement.style.top = (pin.location.y - 70) + 'px';
   pinElement.querySelector('img').setAttribute('src', pin.author.avatar);
-  pinElement.querySelector('img').setAttribute('alt', 'заголовок объявления');
+  pinElement.querySelector('img').setAttribute('alt', pin.offer.title);
 
   return pinElement;
 };
@@ -109,7 +123,7 @@ var displayPins = function (pins) { // отображение пинов. при
   pinsListElement.appendChild(fragment);
 };
 
-displayPins(createPins(8));
+displayPins(createPins(PINS_COUNT));
 
 // Переключение в активное состояние
 document.querySelector('.map').classList.remove('map--faded');
