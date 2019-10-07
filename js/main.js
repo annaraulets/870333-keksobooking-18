@@ -25,11 +25,12 @@ var randomElementAndRemove = function (array) {
 
 // Рандомный состав массива из массивов
 var randomArray = function (array) {
-  var resultLength = randomRandInt(1, array.length);
+  var arrayCopy = array.slice();
+  var resultLength = randomRandInt(1, arrayCopy.length);
 
   var result = [];
   for (var i = 0; i < resultLength; i++) {
-    var x = randomElementAndRemove(array); // результат вызова ф-ции, которая достает рандомный элемент и удаляет его из массива
+    var x = randomElementAndRemove(arrayCopy); // результат вызова ф-ции, которая достает рандомный элемент и удаляет его из массива
     result.push(x);
   }
   return result;
@@ -41,6 +42,12 @@ var PIN_OFFSET_Y = 70;
 var PRICE_MIN = 1000;
 var PRICE_MAX = 100000;
 var HOTEL_TYPES = ['palace', 'flat', 'house', 'bungalo'];
+var HOTEL_TYPES_DICT = {
+  palace: 'Дворец',
+  flat: 'Квартира',
+  house: 'Дом',
+  bungalo: 'Бунгало'
+};
 var ROOMS_MIN = 1;
 var ROOMS_MAX = 5;
 var GUESTS_MIN = 1;
@@ -112,7 +119,44 @@ var renderPinElement = function (pin) {
   return pinElement;
 };
 
-// Функция принимает массив JS-обьектов Визардов и отображает на странице
+// Доп задание. фцнкия делает элемент карточки
+var renderCardElement = function (pin) {
+  var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
+
+  var cardElement = cardTemplate.cloneNode(true);
+  cardElement.querySelector('.popup__avatar').src = pin.author.avatar;
+  cardElement.querySelector('.popup__title').textContent = pin.offer.title;
+  cardElement.querySelector('.popup__text--address').textContent = pin.offer.address;
+  cardElement.querySelector('.popup__text--price').textContent = pin.offer.price + '₽/ночь';
+  cardElement.querySelector('.popup__type').textContent = HOTEL_TYPES_DICT[pin.offer.type];
+  cardElement.querySelector('.popup__text--capacity').textContent = pin.offer.rooms + ' комнаты для '
+  + pin.offer.guests + ' гостей.';
+  cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + pin.offer.checkin
+  + ', выезд до ' + pin.offer.checkout + '.';
+
+  for (var i = 0; i < FACILITIES.length; i++) {
+    if (pin.offer.features.indexOf(FACILITIES[i]) === -1) {
+      cardElement.querySelector('.popup__feature--' + FACILITIES[i]).remove();
+    }
+  }
+
+  cardElement.querySelector('.popup__description').textContent = pin.offer.description;
+  // Заполнение фотографиями из массива в Dom-a
+  var photoTemplate = cardTemplate.querySelector('.popup__photo');
+  var photoFragment = document.createDocumentFragment();
+
+  for (i = 0; i < pin.offer.photos.length; i++) {
+    var photoElement = photoTemplate.cloneNode(true);
+    photoElement.src = pin.offer.photos[i];
+    photoFragment.appendChild(photoElement);
+  }
+  cardElement.querySelector('.popup__photos').innerHTML = '';
+  cardElement.querySelector('.popup__photos').appendChild(photoFragment);
+
+  return cardElement;
+};
+
+// Функция принимает массив JS-обьектов и отображает на странице
 var displayPins = function (pins) { // отображение пинов. принимаю пины
   var fragment = document.createDocumentFragment(); // создаю фрагмент
 
@@ -125,7 +169,14 @@ var displayPins = function (pins) { // отображение пинов. при
   pinsListElement.appendChild(fragment);
 };
 
-displayPins(createPins(PINS_COUNT));
+var pinsData = createPins(PINS_COUNT);
+displayPins(pinsData);
+
+// Отображение карточки с первым объявлением
+document.querySelector('.map').insertBefore(
+    renderCardElement(pinsData[0]),
+    document.querySelector('.map__filters-container')
+);
 
 // Переключение в активное состояние
 document.querySelector('.map').classList.remove('map--faded');
