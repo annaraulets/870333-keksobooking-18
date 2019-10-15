@@ -39,6 +39,7 @@ var randomArray = function (array) {
 var PINS_COUNT = 8;
 var PIN_OFFSET_X = 25;
 var PIN_OFFSET_Y = 70;
+var PIN_OFFSET_NOTACTIVE = 25;
 var PRICE_MIN = 1000;
 var PRICE_MAX = 100000;
 var HOTEL_TYPES = ['palace', 'flat', 'house', 'bungalo'];
@@ -169,15 +170,151 @@ var displayPins = function (pins) { // отображение пинов. при
   pinsListElement.appendChild(fragment);
 };
 
-var pinsData = createPins(PINS_COUNT);
-displayPins(pinsData);
+// var pinsData = createPins(PINS_COUNT);
+// displayPins(pinsData);
 
 // Отображение карточки с первым объявлением
-document.querySelector('.map').insertBefore(
-    renderCardElement(pinsData[0]),
-    document.querySelector('.map__filters-container')
-);
+// document.querySelector('.map').insertBefore(
+//     renderCardElement(pinsData[0]),
+//     document.querySelector('.map__filters-container')
+// );
 
 // Переключение в активное состояние
-document.querySelector('.map').classList.remove('map--faded');
+// document.querySelector('.map').classList.remove('map--faded');
+
+
+// Задание 8
+// НЕААКТИВНОЕ СОСТОЯНИЕ
+var mapMain = document.querySelector('.map');
+
+var adForm = document.querySelector('.notice').querySelector('.ad-form');
+var adFormDisable = adForm.querySelectorAll('fieldset');
+for (var i = 0; i < adFormDisable.length; i++) {
+  adFormDisable[i].setAttribute('disabled', 'disabled');
+}
+
+// Активирование карты
+var mapActivate = function () {
+  document.querySelector('.map').classList.remove('map--faded');
+  adForm.classList.remove('ad-form--disabled');
+
+  for (i = 0; i < adFormDisable.length; i++) {
+    adFormDisable[i].removeAttribute('disabled');
+  }
+};
+
+var ENTER_KEYCODE = 13;
+// var ESC_KEYCODE = 27;
+
+var btnActivate = document.querySelector('.map__pins').querySelector('.map__pin--main');
+
+// отрезает 2 последние буквы
+var removePx = function (kek) {
+  var lol = parseInt(kek.slice(0, kek.length - 2));
+  return lol;
+};
+
+// Адрес метки
+var updateAddress = function (isActive) {
+  var left = removePx(btnActivate.style.left);
+  var top = removePx(btnActivate.style.top);
+
+  left = left + PIN_OFFSET_X;
+  if (isActive) {
+    top = top + PIN_OFFSET_Y;
+  } else {
+    top = top + PIN_OFFSET_NOTACTIVE;
+  }
+
+  var address = left + ', ' + top;
+  adForm.querySelector('input[name="address"]').value = address;
+};
+
+btnActivate.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+  mapActivate();
+  updateAddress(true);
+});
+
+btnActivate.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    mapActivate();
+    updateAddress(true);
+  }
+});
+
+updateAddress(false);
+
+
+// Валидация
+// Валидация поля Заголовка
+var titleInput = adForm.querySelector('input[name="title"]');
+
+titleInput.addEventListener('invalid', function (evt) {
+  if (titleInput.validity.tooShort) {
+    titleInput.setCustomValidity('Минимальная длина — 30 символов');
+  } else if (titleInput.validity.tooLong) {
+    titleInput.setCustomValidity('Максимальная длина — 100 символов');
+  } else if (titleInput.validity.valueMissing) {
+    titleInput.setCustomValidity('Обязательное поле ввода');
+  } else {
+    titleInput.setCustomValidity('');
+  }
+});
+
+titleInput.addEventListener('input', function (evt) {
+  var target = evt.target;
+  if (target.value.length < 2) {
+    target.setCustomValidity('Минимальная длина — 30 символов');
+  } else {
+    target.setCustomValidity('');
+  }
+});
+
+
+// Validation - price per night
+var priceInput = adForm.querySelector('input[name="price"]');
+
+priceInput.addEventListener('invalid', function(evt) {
+  if (priceInput.validity.tooLong) {
+    priceInput.setCustomValidity('Максимальное значение - 1000000');
+  } else if (priceInput.validity.valueMissing) {
+    priceInput.setCustomValidity('Обязательное поле ввода');
+  } else {
+    priceInput.setCustomValidity('');
+  }
+});
+
+priceInput.addEventListener('input', function (evt) {
+  var target = evt.target;
+  if (target.value.length <= 1000000) {
+    target.setCustomValidity('Максимальное значение - 1000000');
+  } else {
+    target.setCustomValidity('');
+  }
+});
+
+// Тип жилья
+
+var hotelType = adForm.querySelector('select[name="type"]');
+
+
+hotelType.addEventListener('change', function () {
+  var selectedPlace = hotelType.querySelector('[selected]');
+
+  if (selectedPlace.value === 'bungalo') {
+    priceInput.min = '0';
+  } else if (selectedPlace.value === 'flat') {
+    priceInput.min = '1000';
+  } else if (selectedPlace.value === 'house') {
+    priceInput.min = '5000';
+  } else if (selectedPlace.value === 'palace') {
+    priceInput.min = '10000';
+    // priceInput.setCustomValidity('Минимальное значение - 10000');
+  }
+});
+
+
+
+
 
