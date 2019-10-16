@@ -219,11 +219,12 @@ var updateAddress = function (isActive) {
   var left = removePx(btnActivate.style.left);
   var top = removePx(btnActivate.style.top);
 
-  left = left + PIN_OFFSET_X;
+
+  left += PIN_OFFSET_X;
   if (isActive) {
-    top = top + PIN_OFFSET_Y;
+    top += PIN_OFFSET_Y;
   } else {
-    top = top + PIN_OFFSET_NOTACTIVE;
+    top += PIN_OFFSET_NOTACTIVE;
   }
 
   var address = left + ', ' + top;
@@ -346,6 +347,13 @@ var roomsSelectChangeHandler = function () {
 
     capacityOption0.removeAttribute('disabled');
   }
+
+  var selectedOption = capacitySelect.querySelector('option[value="' + capacitySelect.value + '"]');
+  if (selectedOption.getAttribute('disabled') === 'disabled') {
+    var notDisableOption = capacitySelect.querySelector('option:not([disabled])');
+    capacitySelect.value = notDisableOption.value;
+  }
+
 };
 
 roomsSelect.addEventListener('change', roomsSelectChangeHandler);
