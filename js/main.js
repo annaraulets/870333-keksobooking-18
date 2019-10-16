@@ -39,6 +39,7 @@ var randomArray = function (array) {
 var PINS_COUNT = 8;
 var PIN_OFFSET_X = 25;
 var PIN_OFFSET_Y = 70;
+var PIN_OFFSET_NOTACTIVE = 25;
 var PRICE_MIN = 1000;
 var PRICE_MAX = 100000;
 var HOTEL_TYPES = ['palace', 'flat', 'house', 'bungalo'];
@@ -179,5 +180,181 @@ document.querySelector('.map').insertBefore(
 );
 
 // Переключение в активное состояние
-document.querySelector('.map').classList.remove('map--faded');
+// document.querySelector('.map').classList.remove('map--faded');
 
+
+// Задание 8
+// НЕААКТИВНОЕ СОСТОЯНИЕ
+// var mapMain = document.querySelector('.map');
+
+var adForm = document.querySelector('.notice').querySelector('.ad-form');
+var adFormDisable = adForm.querySelectorAll('fieldset');
+for (var i = 0; i < adFormDisable.length; i++) {
+  adFormDisable[i].setAttribute('disabled', 'disabled');
+}
+
+// Активирование карты
+var mapActivate = function () {
+  document.querySelector('.map').classList.remove('map--faded');
+  adForm.classList.remove('ad-form--disabled');
+
+  for (i = 0; i < adFormDisable.length; i++) {
+    adFormDisable[i].removeAttribute('disabled');
+  }
+};
+
+var ENTER_KEYCODE = 13;
+// var ESC_KEYCODE = 27;
+
+var btnActivate = document.querySelector('.map__pins').querySelector('.map__pin--main');
+
+// отрезает 2 последние буквы
+var removePx = function (kek) {
+  var lol = parseInt(kek.slice(0, kek.length - 2), 10);
+  return lol;
+};
+
+// Адрес метки
+var updateAddress = function (isActive) {
+  var left = removePx(btnActivate.style.left);
+  var top = removePx(btnActivate.style.top);
+
+
+  left += PIN_OFFSET_X;
+  if (isActive) {
+    top += PIN_OFFSET_Y;
+  } else {
+    top += PIN_OFFSET_NOTACTIVE;
+  }
+
+  var address = left + ', ' + top;
+  adForm.querySelector('input[name="address"]').value = address;
+};
+
+btnActivate.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+  mapActivate();
+  updateAddress(true);
+});
+
+btnActivate.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    mapActivate();
+    updateAddress(true);
+  }
+});
+
+updateAddress(false);
+
+
+// Валидация
+// Валидация поля Заголовка
+var titleInput = adForm.querySelector('input[name="title"]');
+
+titleInput.addEventListener('invalid', function () {
+  if (titleInput.validity.tooShort) {
+    titleInput.setCustomValidity('Минимальная длина — 30 символов');
+  } else if (titleInput.validity.tooLong) {
+    titleInput.setCustomValidity('Максимальная длина — 100 символов');
+  } else if (titleInput.validity.valueMissing) {
+    titleInput.setCustomValidity('Обязательное поле ввода');
+  } else {
+    titleInput.setCustomValidity('');
+  }
+});
+
+
+// Validation - price per night
+var priceInput = adForm.querySelector('input[name="price"]');
+
+priceInput.addEventListener('invalid', function () {
+  if (priceInput.validity.tooLong) {
+    priceInput.setCustomValidity('Максимальное значение - 1000000');
+  } else if (priceInput.validity.valueMissing) {
+    priceInput.setCustomValidity('Обязательное поле ввода');
+  } else {
+    priceInput.setCustomValidity('');
+  }
+});
+
+// Тип жилья
+var hotelTypeSelect = adForm.querySelector('select[name="type"]');
+
+var hotelTypeChangeHandler = function () {
+  if (hotelTypeSelect.value === 'bungalo') {
+    priceInput.min = '0';
+    priceInput.placeholder = '0';
+  } else if (hotelTypeSelect.value === 'flat') {
+    priceInput.min = '1000';
+    priceInput.placeholder = '1000';
+  } else if (hotelTypeSelect.value === 'house') {
+    priceInput.min = '5000';
+    priceInput.placeholder = '5000';
+  } else if (hotelTypeSelect.value === 'palace') {
+    priceInput.min = '10000';
+    priceInput.placeholder = '10000';
+  }
+};
+
+
+hotelTypeSelect.addEventListener('change', hotelTypeChangeHandler);
+hotelTypeChangeHandler();
+
+// Синхронизация вьезда и выезда
+var timeInSelect = adForm.querySelector('select[name="timein"]');
+var timeOutSelect = adForm.querySelector('select[name="timeout"]');
+
+timeInSelect.addEventListener('change', function () {
+  timeOutSelect.value = timeInSelect.value;
+});
+
+timeOutSelect.addEventListener('change', function () {
+  timeInSelect.value = timeOutSelect.value;
+});
+
+
+// Настройка гостей и комнат
+var roomsSelect = adForm.querySelector('select[name="rooms"]');
+var capacitySelect = adForm.querySelector('select[name="capacity"]');
+var capacityOption3 = capacitySelect.querySelector('option[value="3"]');
+var capacityOption2 = capacitySelect.querySelector('option[value="2"]');
+var capacityOption1 = capacitySelect.querySelector('option[value="1"]');
+var capacityOption0 = capacitySelect.querySelector('option[value="0"]');
+
+var roomsSelectChangeHandler = function () {
+  if (roomsSelect.value === '1') {
+    capacityOption1.removeAttribute('disabled');
+
+    capacityOption3.setAttribute('disabled', 'disabled');
+    capacityOption2.setAttribute('disabled', 'disabled');
+    capacityOption0.setAttribute('disabled', 'disabled');
+  } else if (roomsSelect.value === '2') {
+    capacityOption1.removeAttribute('disabled');
+    capacityOption2.removeAttribute('disabled');
+
+    capacityOption3.setAttribute('disabled', 'disabled');
+    capacityOption0.setAttribute('disabled', 'disabled');
+  } else if (roomsSelect.value === '3') {
+    capacityOption1.removeAttribute('disabled');
+    capacityOption2.removeAttribute('disabled');
+    capacityOption3.removeAttribute('disabled');
+
+    capacityOption0.setAttribute('disabled', 'disabled');
+  } else if (roomsSelect.value === '100') {
+    capacityOption1.setAttribute('disabled', 'disabled');
+    capacityOption2.setAttribute('disabled', 'disabled');
+    capacityOption3.setAttribute('disabled', 'disabled');
+
+    capacityOption0.removeAttribute('disabled');
+  }
+
+  var selectedOption = capacitySelect.querySelector('option[value="' + capacitySelect.value + '"]');
+  if (selectedOption.getAttribute('disabled') === 'disabled') {
+    var notDisableOption = capacitySelect.querySelector('option:not([disabled])');
+    capacitySelect.value = notDisableOption.value;
+  }
+
+};
+
+roomsSelect.addEventListener('change', roomsSelectChangeHandler);
+roomsSelectChangeHandler();
