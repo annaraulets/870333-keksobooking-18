@@ -35,7 +35,8 @@ var randomArray = function (array) {
   }
   return result;
 };
-
+var ENTER_KEYCODE = 13;
+var ESC_KEYCODE = 27;
 var PINS_COUNT = 8;
 var PIN_OFFSET_X = 25;
 var PIN_OFFSET_Y = 70;
@@ -117,6 +118,17 @@ var renderPinElement = function (pin) {
   pinElement.querySelector('img').src = pin.author.avatar;
   pinElement.querySelector('img').alt = pin.offer.title;
 
+  // Открытие карточки по нажатию
+  pinElement.addEventListener('click', function () {
+    addCardElement(pin);
+  });
+
+  pinElement.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ENTER_KEYCODE) {
+      addCardElement(pin);
+    }
+  });
+
   return pinElement;
 };
 
@@ -154,6 +166,17 @@ var renderCardElement = function (pin) {
   cardElement.querySelector('.popup__photos').innerHTML = '';
   cardElement.querySelector('.popup__photos').appendChild(photoFragment);
 
+  // Закртыие карточки по нажатию
+  var closeCardButton = cardElement.querySelector('.popup__close');
+  closeCardButton.addEventListener('click', function () {
+    cardElement.remove();
+  });
+  closeCardButton.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ENTER_KEYCODE) {
+      cardElement.remove();
+    }
+  });
+
   return cardElement;
 };
 
@@ -171,16 +194,31 @@ var displayPins = function (pins) { // отображение пинов. при
 };
 
 var pinsData = createPins(PINS_COUNT);
-displayPins(pinsData);
+// displayPins(pinsData);
 
-// Отображение карточки с первым объявлением
-document.querySelector('.map').insertBefore(
-    renderCardElement(pinsData[0]),
-    document.querySelector('.map__filters-container')
-);
 
-// Переключение в активное состояние
-// document.querySelector('.map').classList.remove('map--faded');
+// Удаление карточки при открытие следующей карточки
+var closeCardElement = function () {
+  var cardElement = document.querySelector('.map').querySelector('.map__card');
+  if (cardElement) {
+    cardElement.remove();
+  }
+};
+
+// Отображение карточки с объявлением
+var addCardElement = function (pin) {
+  closeCardElement();
+  document.querySelector('.map').insertBefore(
+      renderCardElement(pin),
+      document.querySelector('.map__filters-container'));
+};
+
+// Закрытие карточки по нажатию ESC
+document.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeCardElement();
+  }
+});
 
 
 // Задание 8
@@ -202,9 +240,6 @@ var mapActivate = function () {
     adFormDisable[i].removeAttribute('disabled');
   }
 };
-
-var ENTER_KEYCODE = 13;
-// var ESC_KEYCODE = 27;
 
 var btnActivate = document.querySelector('.map__pins').querySelector('.map__pin--main');
 
@@ -231,10 +266,14 @@ var updateAddress = function (isActive) {
   adForm.querySelector('input[name="address"]').value = address;
 };
 
+
+// Нажатие на клавную кнопку и вход в активный режим
 btnActivate.addEventListener('mousedown', function (evt) {
   evt.preventDefault();
   mapActivate();
   updateAddress(true);
+  displayPins(pinsData);
+
 });
 
 btnActivate.addEventListener('keydown', function (evt) {
