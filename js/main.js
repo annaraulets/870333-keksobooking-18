@@ -200,7 +200,7 @@ var pinsData = createPins(PINS_COUNT);
 // Удаление карточки при открытие следующей карточки
 var closeCardElement = function () {
   var cardElement = document.querySelector('.map').querySelector('.map__card');
-  if (cardElement !== null) {
+  if (cardElement) {
     cardElement.remove();
   }
 };
@@ -208,8 +208,8 @@ var closeCardElement = function () {
 // Отображение карточки с объявлением
 var addCardElement = function (pin) {
   closeCardElement();
-  document.querySelector('.map').insertBefore(
-      renderCardElement(pin),
+  document.querySelector('.map').insertBefore
+      (renderCardElement(pin),
       document.querySelector('.map__filters-container'));
 };
 
