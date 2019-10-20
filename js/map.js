@@ -1,41 +1,12 @@
 'use strict';
 
-(function () {
-  var ENTER_KEYCODE = 13;
-  var ESC_KEYCODE = 27;
-  var PINS_COUNT = 8;
-  var PIN_OFFSET_X = 25;
-  var PIN_OFFSET_Y = 70;
-  var PIN_OFFSET_NOTACTIVE = 25;
+window.map = (function () {
+
   var HOTEL_TYPES_DICT = {
     palace: 'Дворец',
     flat: 'Квартира',
     house: 'Дом',
     bungalo: 'Бунгало'
-  };
-
-  // Создание DOM-элементов и заполнение данными из массива
-  var renderPinElement = function (pin) {
-    var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
-
-    var pinElement = pinTemplate.cloneNode(true);
-    pinElement.style.left = (pin.location.x - PIN_OFFSET_X) + 'px';
-    pinElement.style.top = (pin.location.y - PIN_OFFSET_Y) + 'px';
-    pinElement.querySelector('img').src = pin.author.avatar;
-    pinElement.querySelector('img').alt = pin.offer.title;
-
-    // Открытие карточки по нажатию
-    pinElement.addEventListener('click', function () {
-      addCardElement(pin);
-    });
-
-    pinElement.addEventListener('keydown', function (evt) {
-      if (evt.keyCode === ENTER_KEYCODE) {
-        addCardElement(pin);
-      }
-    });
-
-    return pinElement;
   };
 
   // Доп задание. фцнкия делает элемент карточки
@@ -80,12 +51,70 @@
       cardElement.remove();
     });
     closeCardButton.addEventListener('keydown', function (evt) {
-      if (evt.keyCode === ENTER_KEYCODE) {
+      window.util.isEnterEvent(evt, function () {
         cardElement.remove();
-      }
+      });
     });
 
     return cardElement;
+  };
+
+  // Отображение карточки с объявлением
+  var addCardElement = function (pin) {
+    closeCardElement();
+    document.querySelector('.map').insertBefore(
+        renderCardElement(pin),
+        document.querySelector('.map__filters-container')
+    );
+  };
+
+  // Закрытие карточки по нажатию ESC
+  document.addEventListener('keydown', function (evt) {
+    window.util.isEscEvent(evt, closeCardElement);
+  });
+
+  // Удаление карточки при открытие следующей карточки
+  var closeCardElement = function () {
+    var cardElement = document.querySelector('.map').querySelector('.map__card');
+    if (cardElement) {
+      cardElement.remove();
+    }
+  };
+
+  return {
+    addCardElement: addCardElement
+  };
+})();
+
+
+(function () {
+  var PINS_COUNT = 8;
+  var PIN_OFFSET_X = 25;
+  var PIN_OFFSET_Y = 70;
+  var PIN_OFFSET_NOTACTIVE = 25;
+
+  // Создание DOM-элементов и заполнение данными из массива
+  var renderPinElement = function (pin) {
+    var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
+
+    var pinElement = pinTemplate.cloneNode(true);
+    pinElement.style.left = (pin.location.x - PIN_OFFSET_X) + 'px';
+    pinElement.style.top = (pin.location.y - PIN_OFFSET_Y) + 'px';
+    pinElement.querySelector('img').src = pin.author.avatar;
+    pinElement.querySelector('img').alt = pin.offer.title;
+
+    // Открытие карточки по нажатию
+    pinElement.addEventListener('click', function () {
+      window.map.addCardElement(pin);
+    });
+
+    pinElement.addEventListener('keydown', function (evt) {
+      window.util.isEnterEvent(evt, function () {
+        window.map.addCardElement(pin);
+      });
+    });
+
+    return pinElement;
   };
 
   // Функция принимает массив JS-обьектов и отображает на странице
@@ -102,37 +131,10 @@
   };
 
   var pinsData = window.data.createPins(PINS_COUNT);
-  // displayPins(pinsData);
 
-
-  // Удаление карточки при открытие следующей карточки
-  var closeCardElement = function () {
-    var cardElement = document.querySelector('.map').querySelector('.map__card');
-    if (cardElement) {
-      cardElement.remove();
-    }
-  };
-
-  // Отображение карточки с объявлением
-  var addCardElement = function (pin) {
-    closeCardElement();
-    document.querySelector('.map').insertBefore(
-        renderCardElement(pin),
-        document.querySelector('.map__filters-container')
-    );
-  };
-
-  // Закрытие карточки по нажатию ESC
-  document.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      closeCardElement();
-    }
-  });
 
   // Задание 8
   // НЕААКТИВНОЕ СОСТОЯНИЕ
-  // var mapMain = document.querySelector('.map');
-
   var adForm = document.querySelector('.notice').querySelector('.ad-form');
   var adFormDisable = adForm.querySelectorAll('fieldset');
   for (var i = 0; i < adFormDisable.length; i++) {
@@ -185,10 +187,10 @@
   });
 
   btnActivate.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
+    window.util.isEnterEvent(evt, function () {
       mapActivate();
       updateAddress(true);
-    }
+    });
   });
 
   updateAddress(false);
