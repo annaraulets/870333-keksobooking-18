@@ -183,7 +183,6 @@ window.map = (function () {
     mapActivate();
     updateAddress(true);
     displayPins(pinsData);
-
   });
 
   btnActivate.addEventListener('keydown', function (evt) {
@@ -194,5 +193,49 @@ window.map = (function () {
   });
 
   updateAddress(false);
+
+  // Перемещение метки по карте
+  btnActivate.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
+
+    var mapWidth = document.querySelector('.map__overlay').offsetWidth;
+    var maxX = mapWidth - btnActivate.offsetWidth;
+    var startCoords = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
+
+    var onMouseMove = function (moveEvt) {
+      moveEvt.preventDefault();
+
+      var shift = {
+        x: startCoords.x - moveEvt.clientX,
+        y: startCoords.y - moveEvt.clientY
+      };
+
+      var newY = btnActivate.offsetTop - shift.y;
+      var newX = btnActivate.offsetLeft - shift.x;
+      if (newX > 3 && newX < maxX && newY > 130 && newY < 630) {
+        startCoords = {
+          x: moveEvt.clientX,
+          y: moveEvt.clientY
+        };
+        btnActivate.style.top = newY + 'px';
+        btnActivate.style.left = newX + 'px';
+        updateAddress();
+      }
+    };
+
+    var onMouseUp = function (upEvt) {
+      upEvt.preventDefault();
+
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
 
 })();
