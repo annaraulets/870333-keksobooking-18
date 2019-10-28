@@ -1,7 +1,8 @@
 'use strict';
 
 (function () {
-// Валидация поля Заголовка
+  var PIN_OFFSET_X = 25;
+  // Валидация поля Заголовка
   var adForm = document.querySelector('.notice').querySelector('.ad-form');
   var titleInput = adForm.querySelector('input[name="title"]');
 
@@ -113,4 +114,63 @@
   roomsSelect.addEventListener('change', roomsSelectChangeHandler);
   roomsSelectChangeHandler();
 
+
+  var showSuccess = function () {
+    var successBlock = document.querySelector('#success').content.querySelector('.success');
+    var successCopy = successBlock.cloneNode(true);
+
+    document.querySelector('body').appendChild(successCopy);
+
+    document.addEventListener('keydown', function (evt) {
+      window.util.isEscEvent(evt, function () {
+        successCopy.remove();
+      });
+    });
+
+    document.addEventListener('click', function () {
+      successCopy.remove();
+    });
+  };
+
+  // ДЕАКТИВИРОВАНИЕ СТРАНИЦЫ
+  var mapDeactivate = function () {
+    document.querySelector('.map').classList.add('map--faded');
+    adForm.classList.add('ad-form--disabled');
+
+    var adFormDisable = adForm.querySelectorAll('fieldset');
+    for (var i = 0; i < adFormDisable.length; i++) {
+      adFormDisable[i].setAttribute('disabled', 'disabled');
+    }
+
+    titleInput.value = '';
+    priceInput.value = '';
+
+    adForm.querySelector('textarea[name="description"]').value = '';
+
+    var pinsRemove = document.querySelector('.map__pins').querySelectorAll('.map__pin');
+    for (i = 0; i < pinsRemove.length; i++) {
+      if (!pinsRemove[i].classList.contains('map__pin--main')) {
+        pinsRemove[i].remove();
+      }
+    }
+
+    var mapWidth = document.querySelector('.map__overlay').offsetWidth;
+    var defaultMainPin = document.querySelector('.map__pins').querySelector('.map__pin--main');
+    defaultMainPin.style.left = ((mapWidth / 2) - PIN_OFFSET_X) + 'px';
+    defaultMainPin.style.top = '375px';
+  };
+
+
+  adForm.addEventListener('submit', function (evt) {
+    window.backend.save(
+        new FormData(adForm),
+        function (_response) {
+          showSuccess();
+        },
+        window.util.showError
+    );
+    evt.preventDefault();
+    mapDeactivate();
+
+  });
 })();
