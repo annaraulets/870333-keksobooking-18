@@ -88,7 +88,7 @@ window.map = (function () {
 
 
 (function () {
-  var PINS_COUNT = 8;
+  // var PINS_COUNT = 8;
   var PIN_OFFSET_X = 25;
   var PIN_OFFSET_Y = 70;
   var PIN_OFFSET_NOTACTIVE = 25;
@@ -130,7 +130,18 @@ window.map = (function () {
     pinsListElement.appendChild(fragment);
   };
 
-  var pinsData = window.data.createPins(PINS_COUNT);
+  // var pinsData = window.data.createPins(PINS_COUNT);
+  var pinsData;
+  window.backend.load(function (response) {
+    pinsData = response;
+  }, function (_error) {
+    var errorBlock = document.querySelector('#error').content.querySelector('.error');
+    var errorCopy = errorBlock.cloneNode(true);
+    var map = document.querySelector('main');
+
+    map.appendChild(errorCopy);
+  }
+  );
 
 
   // Задание 8
