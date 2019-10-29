@@ -134,13 +134,7 @@ window.map = (function () {
   var pinsData;
   window.backend.load(function (response) {
     pinsData = response;
-  }, function (_error) {
-    var errorBlock = document.querySelector('#error').content.querySelector('.error');
-    var errorCopy = errorBlock.cloneNode(true);
-    var map = document.querySelector('main');
-
-    map.appendChild(errorCopy);
-  }
+  }, window.util.showError
   );
 
 
@@ -188,7 +182,7 @@ window.map = (function () {
   };
 
 
-  // Нажатие на клавную кнопку и вход в активный режим
+  // Нажатие на клавную кнопку и ВХОД В АКТИВНЫЙ РЕЖИМ
   btnActivate.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
     mapActivate();
