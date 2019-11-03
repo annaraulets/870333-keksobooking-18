@@ -93,9 +93,18 @@ window.map = (function () {
   var PIN_OFFSET_X = 25;
   var PIN_OFFSET_Y = 70;
   var PIN_OFFSET_NOTACTIVE = 25;
-  var filtersForm = document.querySelector('.map .map__filters-container');
-  var housingTypeSelect = filtersForm.querySelector('.map__filters')
-  .querySelector('select[name="housing-type"]');
+  var filtersForm = document.querySelector('.map .map__filters');
+  var housingTypeSelect = filtersForm.querySelector('select[name="housing-type"]');
+  var housingPriceSelect = filtersForm.querySelector('select[name="housing-price"]');
+  var housingRoomSelect = filtersForm.querySelector('select[name="housing-rooms"]');
+  var housingGuestSelect = filtersForm.querySelector('select[name="housing-guests"]');
+  var featuresInputs = filtersForm.querySelectorAll('.map__features input[name="features"]');
+  // var filterWifiInput = document.getElementById('filter-wifi');
+  // var filterDishwasherInput = document.getElementById('filter-dishwasher');
+  // var filterParkingInput = document.getElementById('filter-parking');
+  // var filterWasherInput = document.getElementById('filter-washer');
+  // var filterElevatorInput = document.getElementById('filter-elevator');
+  // var filterConditionerInput = document.getElementById('filter-conditioner');
 
   // Создание DOM-элементов и заполнение данными из массива
   var renderPinElement = function (pin) {
@@ -193,23 +202,80 @@ window.map = (function () {
     adForm.querySelector('input[name="address"]').value = address;
   };
 
-  var reloadPins = function () {
-    window.map.closeCardElement();
-    var housingType = housingTypeSelect.value;
-    var filteredPins = pinsData.filter(function (it) {
-      return it.offer.type === housingType ||
-        housingType === 'any';
-    }).slice(0, 5);
-    displayPins(filteredPins);
+  var DEBOUNCE_INTERVAL = 300; // ms
+  var debounce = function (cb) {
+    var lastTimeout = null;
+
+    return function () {
+      var parameters = arguments;
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(function () {
+        cb.apply(null, parameters);
+      }, DEBOUNCE_INTERVAL);
+    };
   };
 
+
+  var reloadPinsInstant = function () {
+    window.map.closeCardElement();
+    var housingType = housingTypeSelect.value;
+    var housingPrice = housingPriceSelect.value;
+    var housingRoom = housingRoomSelect.value;
+    var housingGuest = housingGuestSelect.value;
+    var filteredPins = pinsData;
+
+    filteredPins = filteredPins.filter(function (pin) {
+      return pin.offer.type === housingType ||
+        housingType === 'any';
+    });
+
+    filteredPins = filteredPins.filter(function (pin) {
+      if (housingPrice === 'low') {
+        return pin.offer.price < 10000;
+      }
+
+      if (housingPrice === 'middle') {
+        return pin.offer.price >= 10000 &&
+          pin.offer.price <= 50000;
+      }
+
+      if (housingPrice === 'high') {
+        return pin.offer.price > 50000;
+      }
+      // housingPrice === 'any'
+      return true;
+    });
+
+    filteredPins = filteredPins.filter(function (pin) {
+      return pin.offer.guests + '' === housingGuest ||
+        housingGuest === 'any';
+    });
+
+    filteredPins = filteredPins.filter(function (pin) {
+      return pin.offer.rooms + '' === housingRoom ||
+        housingRoom === 'any';
+    });
+
+    featuresInputs.forEach(function (featureInput) {
+      filteredPins = filteredPins.filter(function (pin) {
+        return !featureInput.checked ||
+          pin.offer.features.indexOf(featureInput.value) !== -1;
+      });
+    });
+    filteredPins = filteredPins.slice(0, 5);
+
+    displayPins(filteredPins);
+  };
+  var reloadPins = debounce(reloadPinsInstant);
 
   // Нажатие на клавную кнопку и ВХОД В АКТИВНЫЙ РЕЖИМ
   btnActivate.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
     mapActivate();
     updateAddress(true);
-    reloadPins();
+    reloadPinsInstant();
   });
 
   btnActivate.addEventListener('keydown', function (evt) {
@@ -265,8 +331,13 @@ window.map = (function () {
     document.addEventListener('mouseup', onMouseUp);
   });
 
-  // Изменение пинов на карте по типу жилья
-  housingTypeSelect.addEventListener('change', function () {
-    reloadPins();
+  // Изменение пинов на карте по селектам
+  housingTypeSelect.addEventListener('change', reloadPins);
+  housingPriceSelect.addEventListener('change', reloadPins);
+  housingGuestSelect.addEventListener('change', reloadPins);
+  housingRoomSelect.addEventListener('change', reloadPins);
+  featuresInputs.forEach(function (featureInput) {
+    featureInput.addEventListener('change', reloadPins);
   });
+
 })();
