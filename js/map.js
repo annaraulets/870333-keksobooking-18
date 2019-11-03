@@ -82,7 +82,8 @@ window.map = (function () {
   };
 
   return {
-    addCardElement: addCardElement
+    addCardElement: addCardElement,
+    closeCardElement: closeCardElement
   };
 })();
 
@@ -92,6 +93,9 @@ window.map = (function () {
   var PIN_OFFSET_X = 25;
   var PIN_OFFSET_Y = 70;
   var PIN_OFFSET_NOTACTIVE = 25;
+  var filtersForm = document.querySelector('.map .map__filters-container');
+  var housingTypeSelect = filtersForm.querySelector('.map__filters')
+  .querySelector('select[name="housing-type"]');
 
   // Создание DOM-элементов и заполнение данными из массива
   var renderPinElement = function (pin) {
@@ -127,6 +131,14 @@ window.map = (function () {
     }
 
     var pinsListElement = document.querySelector('.map__pins');
+
+    var pinsRemove = pinsListElement.querySelectorAll('.map__pin');
+    for (i = 0; i < pinsRemove.length; i++) {
+      if (!pinsRemove[i].classList.contains('map__pin--main')) {
+        pinsRemove[i].remove();
+      }
+    }
+
     pinsListElement.appendChild(fragment);
   };
 
@@ -181,13 +193,23 @@ window.map = (function () {
     adForm.querySelector('input[name="address"]').value = address;
   };
 
+  var reloadPins = function () {
+    window.map.closeCardElement();
+    var housingType = housingTypeSelect.value;
+    var filteredPins = pinsData.filter(function (it) {
+      return it.offer.type === housingType ||
+        housingType === 'any';
+    }).slice(0, 5);
+    displayPins(filteredPins);
+  };
+
 
   // Нажатие на клавную кнопку и ВХОД В АКТИВНЫЙ РЕЖИМ
   btnActivate.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
     mapActivate();
     updateAddress(true);
-    displayPins(pinsData);
+    reloadPins();
   });
 
   btnActivate.addEventListener('keydown', function (evt) {
@@ -243,4 +265,8 @@ window.map = (function () {
     document.addEventListener('mouseup', onMouseUp);
   });
 
+  // Изменение пинов на карте по типу жилья
+  housingTypeSelect.addEventListener('change', function () {
+    reloadPins();
+  });
 })();
