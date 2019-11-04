@@ -89,22 +89,17 @@ window.map = (function () {
 
 
 (function () {
-  // var PINS_COUNT = 8;
   var PIN_OFFSET_X = 25;
   var PIN_OFFSET_Y = 70;
   var PIN_OFFSET_NOTACTIVE = 25;
+  var MIN_PRICE = 10000;
+  var MAX_PRICE = 50000;
   var filtersForm = document.querySelector('.map .map__filters');
   var housingTypeSelect = filtersForm.querySelector('select[name="housing-type"]');
   var housingPriceSelect = filtersForm.querySelector('select[name="housing-price"]');
   var housingRoomSelect = filtersForm.querySelector('select[name="housing-rooms"]');
   var housingGuestSelect = filtersForm.querySelector('select[name="housing-guests"]');
   var featuresInputs = filtersForm.querySelectorAll('.map__features input[name="features"]');
-  // var filterWifiInput = document.getElementById('filter-wifi');
-  // var filterDishwasherInput = document.getElementById('filter-dishwasher');
-  // var filterParkingInput = document.getElementById('filter-parking');
-  // var filterWasherInput = document.getElementById('filter-washer');
-  // var filterElevatorInput = document.getElementById('filter-elevator');
-  // var filterConditionerInput = document.getElementById('filter-conditioner');
 
   // Создание DOM-элементов и заполнение данными из массива
   var renderPinElement = function (pin) {
@@ -151,7 +146,6 @@ window.map = (function () {
     pinsListElement.appendChild(fragment);
   };
 
-  // var pinsData = window.data.createPins(PINS_COUNT);
   var pinsData;
   window.backend.load(function (response) {
     pinsData = response;
@@ -202,7 +196,7 @@ window.map = (function () {
     adForm.querySelector('input[name="address"]').value = address;
   };
 
-  var DEBOUNCE_INTERVAL = 300; // ms
+  var DEBOUNCE_INTERVAL = 500; // ms
   var debounce = function (cb) {
     var lastTimeout = null;
 
@@ -233,16 +227,16 @@ window.map = (function () {
 
     filteredPins = filteredPins.filter(function (pin) {
       if (housingPrice === 'low') {
-        return pin.offer.price < 10000;
+        return pin.offer.price < MIN_PRICE;
       }
 
       if (housingPrice === 'middle') {
-        return pin.offer.price >= 10000 &&
-          pin.offer.price <= 50000;
+        return pin.offer.price >= MIN_PRICE &&
+          pin.offer.price <= MAX_PRICE;
       }
 
       if (housingPrice === 'high') {
-        return pin.offer.price > 50000;
+        return pin.offer.price > MAX_PRICE;
       }
       // housingPrice === 'any'
       return true;
@@ -282,11 +276,15 @@ window.map = (function () {
     window.util.isEnterEvent(evt, function () {
       mapActivate();
       updateAddress(true);
+      reloadPinsInstant();
     });
   });
 
   updateAddress(false);
 
+  var LEFT_MARGIN = 3;
+  var TOP_MARGIN = 130;
+  var BOTTOM_MARGIN = 630;
   // Перемещение метки по карте
   btnActivate.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
@@ -308,7 +306,7 @@ window.map = (function () {
 
       var newY = btnActivate.offsetTop - shift.y;
       var newX = btnActivate.offsetLeft - shift.x;
-      if (newX > 3 && newX < maxX && newY > 130 && newY < 630) {
+      if (newX > LEFT_MARGIN && newX < maxX && newY > TOP_MARGIN && newY < BOTTOM_MARGIN) {
         startCoords = {
           x: moveEvt.clientX,
           y: moveEvt.clientY

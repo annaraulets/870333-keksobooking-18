@@ -158,6 +158,19 @@
     var defaultMainPin = document.querySelector('.map__pins').querySelector('.map__pin--main');
     defaultMainPin.style.left = ((mapWidth / 2) - PIN_OFFSET_X) + 'px';
     defaultMainPin.style.top = '375px';
+
+    var resetSelect = function (select) {
+      select.value = select.querySelector('option[selected]').value;
+    };
+    var resetCheckbox = function (input) {
+      input.checked = false;
+    };
+
+    document.querySelectorAll('.map__filters select').forEach(resetSelect);
+    document.querySelectorAll('.map__filters input[type="checkbox"]').forEach(resetCheckbox);
+    adForm.querySelectorAll('select').forEach(resetSelect);
+    adForm.querySelectorAll('input[type="checkbox"]').forEach(resetCheckbox);
+    window.map.closeCardElement();
   };
 
 
@@ -171,6 +184,12 @@
     );
     evt.preventDefault();
     mapDeactivate();
-
   });
+
+  var resetButton = adForm.querySelector('.ad-form__reset');
+
+  resetButton.addEventListener('click', function () {
+    mapDeactivate();
+  });
+
 })();
