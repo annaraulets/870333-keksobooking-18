@@ -1,42 +1,6 @@
 'use strict';
 
 window.data = (function () {
-  var randomRandInt = function (from, to) {
-    var number = from + Math.floor(Math.random() * (to + 1 - from));
-    return number;
-  };
-
-
-  // Функция которая возвращает рандомный элемент из массива(пригодится)
-  var randomElement = function (array) {
-    var randomNumber = Math.floor(Math.random() * array.length);
-    return array[randomNumber];
-  };
-
-  // Рандомный элемент и удаление из массива
-  var randomElementAndRemove = function (array) {
-    var randomNumber = Math.floor(Math.random() * array.length);
-    var result = array[randomNumber];
-
-    array.splice(randomNumber, 1);
-
-    return result;
-  };
-
-
-  // Рандомный состав массива из массивов
-  var randomArray = function (array) {
-    var arrayCopy = array.slice();
-    var resultLength = randomRandInt(1, arrayCopy.length);
-
-    var result = [];
-    for (var i = 0; i < resultLength; i++) {
-      var x = randomElementAndRemove(arrayCopy); // результат вызова ф-ции, которая достает рандомный элемент и удаляет его из массива
-      result.push(x);
-    }
-    return result;
-  };
-
 
   var PRICE_MIN = 1000;
   var PRICE_MAX = 100000;
@@ -52,8 +16,40 @@ window.data = (function () {
     'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
     'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 
+  var randomRandInt = function (from, to) {
+    var number = from + Math.floor(Math.random() * (to + 1 - from));
+    return number;
+  };
 
-  // 1.Напишите функцию для создания массива из 8 сгенерированных JS объектов.
+
+  var randomElement = function (items) {
+    var randomNumber = Math.floor(Math.random() * items.length);
+    return items[randomNumber];
+  };
+
+  var randomElementAndRemove = function (items) {
+    var randomNumber = Math.floor(Math.random() * items.length);
+    var result = items[randomNumber];
+
+    items.splice(randomNumber, 1);
+
+    return result;
+  };
+
+
+  var randomArray = function (items) {
+    var itemsCopy = items.slice();
+    var resultLength = randomRandInt(1, itemsCopy.length);
+
+    var result = [];
+    for (var i = 0; i < resultLength; i++) {
+      var x = randomElementAndRemove(itemsCopy);
+      result.push(x);
+    }
+    return result;
+  };
+
+
   var createPin = function (pinNumber) {
     var mapWidth = document.querySelector('.map__overlay').offsetWidth;
     var x = randomRandInt(100, mapWidth);
@@ -86,15 +82,14 @@ window.data = (function () {
     };
   };
 
-  // Функция создает массив обектов
   var createPins = function (pinsCount) {
-    var result = [];
+    var pins = [];
 
     for (var i = 1; i <= pinsCount; i++) {
-      result.push(createPin(i));
+      pins.push(createPin(i));
     }
 
-    return result;
+    return pins;
   };
 
 

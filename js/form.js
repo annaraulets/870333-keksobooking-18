@@ -2,7 +2,6 @@
 
 (function () {
   var PIN_OFFSET_X = 25;
-  // Валидация поля Заголовка
   var adForm = document.querySelector('.notice').querySelector('.ad-form');
   var titleInput = adForm.querySelector('input[name="title"]');
 
@@ -19,7 +18,6 @@
   });
 
 
-  // Validation - price per night
   var priceInput = adForm.querySelector('input[name="price"]');
 
   priceInput.addEventListener('invalid', function () {
@@ -32,7 +30,7 @@
     }
   });
 
-  // Тип жилья
+
   var hotelTypeSelect = adForm.querySelector('select[name="type"]');
 
   var hotelTypeChangeHandler = function () {
@@ -55,7 +53,6 @@
   hotelTypeChangeHandler();
 
 
-  // Синхронизация вьезда и выезда
   var timeInSelect = adForm.querySelector('select[name="timein"]');
   var timeOutSelect = adForm.querySelector('select[name="timeout"]');
 
@@ -68,7 +65,6 @@
   });
 
 
-  // Настройка гостей и комнат
   var roomsSelect = adForm.querySelector('select[name="rooms"]');
   var capacitySelect = adForm.querySelector('select[name="capacity"]');
   var capacityOption3 = capacitySelect.querySelector('option[value="3"]');
@@ -132,7 +128,7 @@
     });
   };
 
-  // ДЕАКТИВИРОВАНИЕ СТРАНИЦЫ
+
   var mapDeactivate = function () {
     document.querySelector('.map').classList.add('map--faded');
     adForm.classList.add('ad-form--disabled');
