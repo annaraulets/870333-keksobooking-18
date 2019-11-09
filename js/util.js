@@ -4,14 +4,14 @@ window.util = (function () {
   var ENTER_KEYCODE = 13;
   var ESC_KEYCODE = 27;
 
-  var isEscEvent = function (evt, action) {
+  var isEscEvent = function (evt, cb) {
     if (evt.keyCode === ESC_KEYCODE) {
-      action();
+      cb();
     }
   };
-  var isEnterEvent = function (evt, action) {
+  var isEnterEvent = function (evt, cb) {
     if (evt.keyCode === ENTER_KEYCODE) {
-      action();
+      cb();
     }
   };
 

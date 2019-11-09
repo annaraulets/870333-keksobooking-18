@@ -2,6 +2,7 @@
 
 (function () {
   var PIN_OFFSET_X = 25;
+  var MAIN_PIN_TOP_MARGIN = 375;
   var adForm = document.querySelector('.notice').querySelector('.ad-form');
   var titleInput = adForm.querySelector('input[name="title"]');
 
@@ -33,7 +34,7 @@
 
   var hotelTypeSelect = adForm.querySelector('select[name="type"]');
 
-  var hotelTypeChangeHandler = function () {
+  var setInputParams = function () {
     if (hotelTypeSelect.value === 'bungalo') {
       priceInput.min = '0';
       priceInput.placeholder = '0';
@@ -49,8 +50,12 @@
     }
   };
 
+  var hotelTypeChangeHandler = function () {
+    setInputParams();
+  };
+
   hotelTypeSelect.addEventListener('change', hotelTypeChangeHandler);
-  hotelTypeChangeHandler();
+  setInputParams();
 
 
   var timeInSelect = adForm.querySelector('select[name="timein"]');
@@ -72,7 +77,7 @@
   var capacityOption1 = capacitySelect.querySelector('option[value="1"]');
   var capacityOption0 = capacitySelect.querySelector('option[value="0"]');
 
-  var roomsSelectChangeHandler = function () {
+  var setSelectParams = function () {
     if (roomsSelect.value === '1') {
       capacityOption1.removeAttribute('disabled');
 
@@ -107,8 +112,12 @@
 
   };
 
+  var roomsSelectChangeHandler = function () {
+    setSelectParams();
+  };
+
   roomsSelect.addEventListener('change', roomsSelectChangeHandler);
-  roomsSelectChangeHandler();
+  setSelectParams();
 
 
   var showSuccess = function () {
@@ -153,7 +162,7 @@
     var mapWidth = document.querySelector('.map__overlay').offsetWidth;
     var defaultMainPin = document.querySelector('.map__pins').querySelector('.map__pin--main');
     defaultMainPin.style.left = ((mapWidth / 2) - PIN_OFFSET_X) + 'px';
-    defaultMainPin.style.top = '375px';
+    defaultMainPin.style.top = MAIN_PIN_TOP_MARGIN + 'px';
 
     var resetSelect = function (select) {
       select.value = select.querySelector('option[selected]').value;

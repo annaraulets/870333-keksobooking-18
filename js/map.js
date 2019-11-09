@@ -174,9 +174,8 @@ window.map = (function () {
   var btnActivate = document.querySelector('.map__pins').querySelector('.map__pin--main');
 
 
-  var removePx = function (kek) {
-    var lol = parseInt(kek.slice(0, kek.length - 2), 10);
-    return lol;
+  var removePx = function (numberWithPx) {
+    return parseInt(numberWithPx.slice(0, numberWithPx.length - 2), 10);
   };
 
 

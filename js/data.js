@@ -16,18 +16,18 @@ window.data = (function () {
     'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
     'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 
-  var randomRandInt = function (from, to) {
+  var getRandomInt = function (from, to) {
     var number = from + Math.floor(Math.random() * (to + 1 - from));
     return number;
   };
 
 
-  var randomElement = function (items) {
+  var getRandomElement = function (items) {
     var randomNumber = Math.floor(Math.random() * items.length);
     return items[randomNumber];
   };
 
-  var randomElementAndRemove = function (items) {
+  var getRandomElementAndRemove = function (items) {
     var randomNumber = Math.floor(Math.random() * items.length);
     var result = items[randomNumber];
 
@@ -37,23 +37,23 @@ window.data = (function () {
   };
 
 
-  var randomArray = function (items) {
+  var getRandomArray = function (items) {
     var itemsCopy = items.slice();
-    var resultLength = randomRandInt(1, itemsCopy.length);
+    var resultLength = getRandomInt(1, itemsCopy.length);
 
-    var result = [];
+    var randomItems = [];
     for (var i = 0; i < resultLength; i++) {
-      var x = randomElementAndRemove(itemsCopy);
-      result.push(x);
+      var x = getRandomElementAndRemove(itemsCopy);
+      randomItems.push(x);
     }
-    return result;
+    return randomItems;
   };
 
 
   var createPin = function (pinNumber) {
     var mapWidth = document.querySelector('.map__overlay').offsetWidth;
-    var x = randomRandInt(100, mapWidth);
-    var y = randomRandInt(130, 630);
+    var pointX = getRandomInt(100, mapWidth);
+    var pointY = getRandomInt(130, 630);
 
 
     return {
@@ -63,21 +63,21 @@ window.data = (function () {
 
       offer: {
         title: 'Заголовок обьявления',
-        address: x + ', ' + y,
-        price: randomRandInt(PRICE_MIN, PRICE_MAX),
-        type: randomElement(HOTEL_TYPES),
-        rooms: randomRandInt(ROOMS_MIN, ROOMS_MAX),
-        guests: randomRandInt(GUESTS_MIN, GUESTS_MAX),
-        checkin: randomElement(TIMES),
-        checkout: randomElement(TIMES),
-        features: randomArray(FACILITIES),
+        address: pointX + ', ' + pointY,
+        price: getRandomInt(PRICE_MIN, PRICE_MAX),
+        type: getRandomElement(HOTEL_TYPES),
+        rooms: getRandomInt(ROOMS_MIN, ROOMS_MAX),
+        guests: getRandomInt(GUESTS_MIN, GUESTS_MAX),
+        checkin: getRandomElement(TIMES),
+        checkout: getRandomElement(TIMES),
+        features: getRandomArray(FACILITIES),
         description: ' ',
-        photos: randomArray(PHOTO_LINKS)
+        photos: getRandomArray(PHOTO_LINKS)
       },
 
       location: {
-        x: x,
-        y: y
+        x: pointX,
+        y: pointY
       }
     };
   };
