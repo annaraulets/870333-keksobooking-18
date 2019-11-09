@@ -1,8 +1,8 @@
 'use strict';
 
 (function () {
-  var PIN_OFFSET_X = 25;
   var MAIN_PIN_TOP_MARGIN = 375;
+  var MAIN_PIN_LEFT_MARGIN = 570;
   var adForm = document.querySelector('.notice').querySelector('.ad-form');
   var titleInput = adForm.querySelector('input[name="title"]');
 
@@ -17,6 +17,9 @@
       titleInput.setCustomValidity('');
     }
   });
+  titleInput.addEventListener('change', function () {
+    titleInput.checkValidity();
+  });
 
 
   var priceInput = adForm.querySelector('input[name="price"]');
@@ -29,6 +32,9 @@
     } else {
       priceInput.setCustomValidity('');
     }
+  });
+  priceInput.addEventListener('change', function () {
+    priceInput.checkValidity();
   });
 
 
@@ -143,9 +149,9 @@
     adForm.classList.add('ad-form--disabled');
 
     var adFormDisable = adForm.querySelectorAll('fieldset');
-    for (var i = 0; i < adFormDisable.length; i++) {
-      adFormDisable[i].setAttribute('disabled', 'disabled');
-    }
+    adFormDisable.forEach(function (element) {
+      element.setAttribute('disabled', 'disabled');
+    });
 
     titleInput.value = '';
     priceInput.value = '';
@@ -153,15 +159,14 @@
     adForm.querySelector('textarea[name="description"]').value = '';
 
     var pinsRemove = document.querySelector('.map__pins').querySelectorAll('.map__pin');
-    for (i = 0; i < pinsRemove.length; i++) {
-      if (!pinsRemove[i].classList.contains('map__pin--main')) {
-        pinsRemove[i].remove();
+    pinsRemove.forEach(function (element) {
+      if (!element.classList.contains('map__pin--main')) {
+        element.remove();
       }
-    }
+    });
 
-    var mapWidth = document.querySelector('.map__overlay').offsetWidth;
     var defaultMainPin = document.querySelector('.map__pins').querySelector('.map__pin--main');
-    defaultMainPin.style.left = ((mapWidth / 2) - PIN_OFFSET_X) + 'px';
+    defaultMainPin.style.left = MAIN_PIN_LEFT_MARGIN + 'px';
     defaultMainPin.style.top = MAIN_PIN_TOP_MARGIN + 'px';
 
     var resetSelect = function (select) {
@@ -176,6 +181,9 @@
     adForm.querySelectorAll('select').forEach(resetSelect);
     adForm.querySelectorAll('input[type="checkbox"]').forEach(resetCheckbox);
     window.map.closeCardElement();
+    window.map.updateAddress();
+
+    setSelectParams();
   };
 
 
