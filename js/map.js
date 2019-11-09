@@ -9,7 +9,6 @@ window.map = (function () {
     bungalo: 'Бунгало'
   };
 
-  // Доп задание. фцнкия делает элемент карточки
   var renderCardElement = function (pin) {
     var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
 
@@ -33,7 +32,7 @@ window.map = (function () {
     }
 
     cardElement.querySelector('.popup__description').textContent = pin.offer.description;
-    // Заполнение фотографиями из массива в Dom-a
+
     var photoTemplate = cardTemplate.querySelector('.popup__photo');
     var photoFragment = document.createDocumentFragment();
 
@@ -45,7 +44,7 @@ window.map = (function () {
     cardElement.querySelector('.popup__photos').innerHTML = '';
     cardElement.querySelector('.popup__photos').appendChild(photoFragment);
 
-    // Закртыие карточки по нажатию
+
     var closeCardButton = cardElement.querySelector('.popup__close');
     closeCardButton.addEventListener('click', function () {
       cardElement.remove();
@@ -59,7 +58,6 @@ window.map = (function () {
     return cardElement;
   };
 
-  // Отображение карточки с объявлением
   var addCardElement = function (pin) {
     closeCardElement();
     document.querySelector('.map').insertBefore(
@@ -68,12 +66,12 @@ window.map = (function () {
     );
   };
 
-  // Закрытие карточки по нажатию ESC
+
   document.addEventListener('keydown', function (evt) {
     window.util.isEscEvent(evt, closeCardElement);
   });
 
-  // Удаление карточки при открытие следующей карточки
+
   var closeCardElement = function () {
     var cardElement = document.querySelector('.map').querySelector('.map__card');
     if (cardElement) {
@@ -89,24 +87,23 @@ window.map = (function () {
 
 
 (function () {
-  // var PINS_COUNT = 8;
+  var DEBOUNCE_INTERVAL = 500; // ms
   var PIN_OFFSET_X = 25;
   var PIN_OFFSET_Y = 70;
   var PIN_OFFSET_NOTACTIVE = 25;
+  var MIN_PRICE = 10000;
+  var MAX_PRICE = 50000;
+  var LEFT_MARGIN = 3;
+  var TOP_MARGIN = 130;
+  var BOTTOM_MARGIN = 630;
   var filtersForm = document.querySelector('.map .map__filters');
   var housingTypeSelect = filtersForm.querySelector('select[name="housing-type"]');
   var housingPriceSelect = filtersForm.querySelector('select[name="housing-price"]');
   var housingRoomSelect = filtersForm.querySelector('select[name="housing-rooms"]');
   var housingGuestSelect = filtersForm.querySelector('select[name="housing-guests"]');
   var featuresInputs = filtersForm.querySelectorAll('.map__features input[name="features"]');
-  // var filterWifiInput = document.getElementById('filter-wifi');
-  // var filterDishwasherInput = document.getElementById('filter-dishwasher');
-  // var filterParkingInput = document.getElementById('filter-parking');
-  // var filterWasherInput = document.getElementById('filter-washer');
-  // var filterElevatorInput = document.getElementById('filter-elevator');
-  // var filterConditionerInput = document.getElementById('filter-conditioner');
 
-  // Создание DOM-элементов и заполнение данными из массива
+
   var renderPinElement = function (pin) {
     var pinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
 
@@ -116,7 +113,7 @@ window.map = (function () {
     pinElement.querySelector('img').src = pin.author.avatar;
     pinElement.querySelector('img').alt = pin.offer.title;
 
-    // Открытие карточки по нажатию
+
     pinElement.addEventListener('click', function () {
       window.map.addCardElement(pin);
     });
@@ -130,13 +127,13 @@ window.map = (function () {
     return pinElement;
   };
 
-  // Функция принимает массив JS-обьектов и отображает на странице
-  var displayPins = function (pins) { // отображение пинов. принимаю пины
-    var fragment = document.createDocumentFragment(); // создаю фрагмент
+
+  var displayPins = function (pins) {
+    var fragment = document.createDocumentFragment();
 
     for (var i = 0; i < pins.length; i++) {
-      var pinElement = renderPinElement(pins[i]); // превращает JS-обьект(элемент) в DOM-элемент
-      fragment.appendChild(pinElement); // всасываю фрагмент в пин элемент
+      var pinElement = renderPinElement(pins[i]);
+      fragment.appendChild(pinElement);
     }
 
     var pinsListElement = document.querySelector('.map__pins');
@@ -151,7 +148,6 @@ window.map = (function () {
     pinsListElement.appendChild(fragment);
   };
 
-  // var pinsData = window.data.createPins(PINS_COUNT);
   var pinsData;
   window.backend.load(function (response) {
     pinsData = response;
@@ -159,15 +155,13 @@ window.map = (function () {
   );
 
 
-  // Задание 8
-  // НЕААКТИВНОЕ СОСТОЯНИЕ
   var adForm = document.querySelector('.notice').querySelector('.ad-form');
   var adFormDisable = adForm.querySelectorAll('fieldset');
   for (var i = 0; i < adFormDisable.length; i++) {
     adFormDisable[i].setAttribute('disabled', 'disabled');
   }
 
-  // Активирование карты
+
   var mapActivate = function () {
     document.querySelector('.map').classList.remove('map--faded');
     adForm.classList.remove('ad-form--disabled');
@@ -179,13 +173,12 @@ window.map = (function () {
 
   var btnActivate = document.querySelector('.map__pins').querySelector('.map__pin--main');
 
-  // отрезает 2 последние буквы
-  var removePx = function (kek) {
-    var lol = parseInt(kek.slice(0, kek.length - 2), 10);
-    return lol;
+
+  var removePx = function (numberWithPx) {
+    return parseInt(numberWithPx.slice(0, numberWithPx.length - 2), 10);
   };
 
-  // Адрес метки
+
   var updateAddress = function (isActive) {
     var left = removePx(btnActivate.style.left);
     var top = removePx(btnActivate.style.top);
@@ -202,7 +195,6 @@ window.map = (function () {
     adForm.querySelector('input[name="address"]').value = address;
   };
 
-  var DEBOUNCE_INTERVAL = 300; // ms
   var debounce = function (cb) {
     var lastTimeout = null;
 
@@ -233,18 +225,18 @@ window.map = (function () {
 
     filteredPins = filteredPins.filter(function (pin) {
       if (housingPrice === 'low') {
-        return pin.offer.price < 10000;
+        return pin.offer.price < MIN_PRICE;
       }
 
       if (housingPrice === 'middle') {
-        return pin.offer.price >= 10000 &&
-          pin.offer.price <= 50000;
+        return pin.offer.price >= MIN_PRICE &&
+          pin.offer.price <= MAX_PRICE;
       }
 
       if (housingPrice === 'high') {
-        return pin.offer.price > 50000;
+        return pin.offer.price > MAX_PRICE;
       }
-      // housingPrice === 'any'
+
       return true;
     });
 
@@ -270,7 +262,6 @@ window.map = (function () {
   };
   var reloadPins = debounce(reloadPinsInstant);
 
-  // Нажатие на клавную кнопку и ВХОД В АКТИВНЫЙ РЕЖИМ
   btnActivate.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
     mapActivate();
@@ -282,12 +273,13 @@ window.map = (function () {
     window.util.isEnterEvent(evt, function () {
       mapActivate();
       updateAddress(true);
+      reloadPinsInstant();
     });
   });
 
   updateAddress(false);
 
-  // Перемещение метки по карте
+
   btnActivate.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
 
@@ -308,7 +300,7 @@ window.map = (function () {
 
       var newY = btnActivate.offsetTop - shift.y;
       var newX = btnActivate.offsetLeft - shift.x;
-      if (newX > 3 && newX < maxX && newY > 130 && newY < 630) {
+      if (newX > LEFT_MARGIN && newX < maxX && newY > TOP_MARGIN && newY < BOTTOM_MARGIN) {
         startCoords = {
           x: moveEvt.clientX,
           y: moveEvt.clientY
@@ -331,7 +323,7 @@ window.map = (function () {
     document.addEventListener('mouseup', onMouseUp);
   });
 
-  // Изменение пинов на карте по селектам
+
   housingTypeSelect.addEventListener('change', reloadPins);
   housingPriceSelect.addEventListener('change', reloadPins);
   housingGuestSelect.addEventListener('change', reloadPins);

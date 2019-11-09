@@ -2,7 +2,7 @@
 
 (function () {
   var PIN_OFFSET_X = 25;
-  // Валидация поля Заголовка
+  var MAIN_PIN_TOP_MARGIN = 375;
   var adForm = document.querySelector('.notice').querySelector('.ad-form');
   var titleInput = adForm.querySelector('input[name="title"]');
 
@@ -19,7 +19,6 @@
   });
 
 
-  // Validation - price per night
   var priceInput = adForm.querySelector('input[name="price"]');
 
   priceInput.addEventListener('invalid', function () {
@@ -32,10 +31,10 @@
     }
   });
 
-  // Тип жилья
+
   var hotelTypeSelect = adForm.querySelector('select[name="type"]');
 
-  var hotelTypeChangeHandler = function () {
+  var setInputParams = function () {
     if (hotelTypeSelect.value === 'bungalo') {
       priceInput.min = '0';
       priceInput.placeholder = '0';
@@ -51,11 +50,14 @@
     }
   };
 
+  var hotelTypeChangeHandler = function () {
+    setInputParams();
+  };
+
   hotelTypeSelect.addEventListener('change', hotelTypeChangeHandler);
-  hotelTypeChangeHandler();
+  setInputParams();
 
 
-  // Синхронизация вьезда и выезда
   var timeInSelect = adForm.querySelector('select[name="timein"]');
   var timeOutSelect = adForm.querySelector('select[name="timeout"]');
 
@@ -68,7 +70,6 @@
   });
 
 
-  // Настройка гостей и комнат
   var roomsSelect = adForm.querySelector('select[name="rooms"]');
   var capacitySelect = adForm.querySelector('select[name="capacity"]');
   var capacityOption3 = capacitySelect.querySelector('option[value="3"]');
@@ -76,7 +77,7 @@
   var capacityOption1 = capacitySelect.querySelector('option[value="1"]');
   var capacityOption0 = capacitySelect.querySelector('option[value="0"]');
 
-  var roomsSelectChangeHandler = function () {
+  var setSelectParams = function () {
     if (roomsSelect.value === '1') {
       capacityOption1.removeAttribute('disabled');
 
@@ -111,8 +112,12 @@
 
   };
 
+  var roomsSelectChangeHandler = function () {
+    setSelectParams();
+  };
+
   roomsSelect.addEventListener('change', roomsSelectChangeHandler);
-  roomsSelectChangeHandler();
+  setSelectParams();
 
 
   var showSuccess = function () {
@@ -132,7 +137,7 @@
     });
   };
 
-  // ДЕАКТИВИРОВАНИЕ СТРАНИЦЫ
+
   var mapDeactivate = function () {
     document.querySelector('.map').classList.add('map--faded');
     adForm.classList.add('ad-form--disabled');
@@ -157,7 +162,20 @@
     var mapWidth = document.querySelector('.map__overlay').offsetWidth;
     var defaultMainPin = document.querySelector('.map__pins').querySelector('.map__pin--main');
     defaultMainPin.style.left = ((mapWidth / 2) - PIN_OFFSET_X) + 'px';
-    defaultMainPin.style.top = '375px';
+    defaultMainPin.style.top = MAIN_PIN_TOP_MARGIN + 'px';
+
+    var resetSelect = function (select) {
+      select.value = select.querySelector('option[selected]').value;
+    };
+    var resetCheckbox = function (input) {
+      input.checked = false;
+    };
+
+    document.querySelectorAll('.map__filters select').forEach(resetSelect);
+    document.querySelectorAll('.map__filters input[type="checkbox"]').forEach(resetCheckbox);
+    adForm.querySelectorAll('select').forEach(resetSelect);
+    adForm.querySelectorAll('input[type="checkbox"]').forEach(resetCheckbox);
+    window.map.closeCardElement();
   };
 
 
@@ -171,6 +189,12 @@
     );
     evt.preventDefault();
     mapDeactivate();
-
   });
+
+  var resetButton = adForm.querySelector('.ad-form__reset');
+
+  resetButton.addEventListener('click', function () {
+    mapDeactivate();
+  });
+
 })();

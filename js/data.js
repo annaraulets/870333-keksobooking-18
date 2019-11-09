@@ -1,42 +1,6 @@
 'use strict';
 
 window.data = (function () {
-  var randomRandInt = function (from, to) {
-    var number = from + Math.floor(Math.random() * (to + 1 - from));
-    return number;
-  };
-
-
-  // Функция которая возвращает рандомный элемент из массива(пригодится)
-  var randomElement = function (array) {
-    var randomNumber = Math.floor(Math.random() * array.length);
-    return array[randomNumber];
-  };
-
-  // Рандомный элемент и удаление из массива
-  var randomElementAndRemove = function (array) {
-    var randomNumber = Math.floor(Math.random() * array.length);
-    var result = array[randomNumber];
-
-    array.splice(randomNumber, 1);
-
-    return result;
-  };
-
-
-  // Рандомный состав массива из массивов
-  var randomArray = function (array) {
-    var arrayCopy = array.slice();
-    var resultLength = randomRandInt(1, arrayCopy.length);
-
-    var result = [];
-    for (var i = 0; i < resultLength; i++) {
-      var x = randomElementAndRemove(arrayCopy); // результат вызова ф-ции, которая достает рандомный элемент и удаляет его из массива
-      result.push(x);
-    }
-    return result;
-  };
-
 
   var PRICE_MIN = 1000;
   var PRICE_MAX = 100000;
@@ -52,12 +16,44 @@ window.data = (function () {
     'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
     'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
 
+  var getRandomInt = function (from, to) {
+    var number = from + Math.floor(Math.random() * (to + 1 - from));
+    return number;
+  };
 
-  // 1.Напишите функцию для создания массива из 8 сгенерированных JS объектов.
+
+  var getRandomElement = function (items) {
+    var randomNumber = Math.floor(Math.random() * items.length);
+    return items[randomNumber];
+  };
+
+  var getRandomElementAndRemove = function (items) {
+    var randomNumber = Math.floor(Math.random() * items.length);
+    var result = items[randomNumber];
+
+    items.splice(randomNumber, 1);
+
+    return result;
+  };
+
+
+  var getRandomArray = function (items) {
+    var itemsCopy = items.slice();
+    var resultLength = getRandomInt(1, itemsCopy.length);
+
+    var randomItems = [];
+    for (var i = 0; i < resultLength; i++) {
+      var x = getRandomElementAndRemove(itemsCopy);
+      randomItems.push(x);
+    }
+    return randomItems;
+  };
+
+
   var createPin = function (pinNumber) {
     var mapWidth = document.querySelector('.map__overlay').offsetWidth;
-    var x = randomRandInt(100, mapWidth);
-    var y = randomRandInt(130, 630);
+    var pointX = getRandomInt(100, mapWidth);
+    var pointY = getRandomInt(130, 630);
 
 
     return {
@@ -67,34 +63,33 @@ window.data = (function () {
 
       offer: {
         title: 'Заголовок обьявления',
-        address: x + ', ' + y,
-        price: randomRandInt(PRICE_MIN, PRICE_MAX),
-        type: randomElement(HOTEL_TYPES),
-        rooms: randomRandInt(ROOMS_MIN, ROOMS_MAX),
-        guests: randomRandInt(GUESTS_MIN, GUESTS_MAX),
-        checkin: randomElement(TIMES),
-        checkout: randomElement(TIMES),
-        features: randomArray(FACILITIES),
+        address: pointX + ', ' + pointY,
+        price: getRandomInt(PRICE_MIN, PRICE_MAX),
+        type: getRandomElement(HOTEL_TYPES),
+        rooms: getRandomInt(ROOMS_MIN, ROOMS_MAX),
+        guests: getRandomInt(GUESTS_MIN, GUESTS_MAX),
+        checkin: getRandomElement(TIMES),
+        checkout: getRandomElement(TIMES),
+        features: getRandomArray(FACILITIES),
         description: ' ',
-        photos: randomArray(PHOTO_LINKS)
+        photos: getRandomArray(PHOTO_LINKS)
       },
 
       location: {
-        x: x,
-        y: y
+        x: pointX,
+        y: pointY
       }
     };
   };
 
-  // Функция создает массив обектов
   var createPins = function (pinsCount) {
-    var result = [];
+    var pins = [];
 
     for (var i = 1; i <= pinsCount; i++) {
-      result.push(createPin(i));
+      pins.push(createPin(i));
     }
 
-    return result;
+    return pins;
   };
 
 
