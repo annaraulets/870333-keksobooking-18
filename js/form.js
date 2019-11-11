@@ -182,6 +182,7 @@
     adForm.querySelectorAll('input[type="checkbox"]').forEach(resetCheckbox);
     window.map.closeCardElement();
     window.map.updateAddress();
+    window.map.disableFilters();
 
     setSelectParams();
   };
