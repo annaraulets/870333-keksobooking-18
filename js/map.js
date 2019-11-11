@@ -168,9 +168,9 @@ window.map = (function () {
   var pinsData;
   window.backend.load(function (response) {
     pinsData = response;
-    enableFilters();
     if (isMapActive()) {
       reloadPinsInstant();
+      enableFilters();
     }
   }, window.util.showError
   );
@@ -189,6 +189,9 @@ window.map = (function () {
     adForm.classList.remove('ad-form--disabled');
 
     adFormDisable.forEach(removeDisable);
+    if (pinsData) {
+      enableFilters();
+    }
   };
 
   var btnActivate = document.querySelector('.map__pins').querySelector('.map__pin--main');
@@ -361,6 +364,7 @@ window.map = (function () {
 
   return {
     closeCardElement: closeCardElement,
-    updateAddress: updateAddress
+    updateAddress: updateAddress,
+    disableFilters: disableFilters
   };
 })();
